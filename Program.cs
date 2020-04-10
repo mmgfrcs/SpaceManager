@@ -1,5 +1,5 @@
-﻿using System;
-using SpaceManager.Engine;
+﻿using SpaceManager.Engine;
+using System.Threading;
 
 namespace SpaceManager
 {
@@ -9,7 +9,11 @@ namespace SpaceManager
         {
             GameEngine engine = new GameEngine();
             engine.Initialize();
-            Console.WriteLine("Hello World!");
+            while(true)
+            {
+                engine.NextStep();
+                Thread.Sleep(500);
+            }
         }
     }
 }
