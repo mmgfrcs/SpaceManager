@@ -48,22 +48,10 @@ namespace SpaceManager.Engine {
             for (int i = 0; i<gameData.CurrentStation.GetComponentCount(); i++)
             {
                 IComponent component = gameData.CurrentStation.GetComponent(i);
-                if (!detailPrint.ContainsKey(component.Category))
+                if (!detailPrint.ContainsKey(component.Category)) 
                     detailPrint.Add(component.Category, new StringBuilder(component.Category + ":\n"));
-
-                string appendString = "";
-                if (component is IPowerGenerator)
-                {
-                    IPowerGenerator generator = component as IPowerGenerator;
-                    appendString = $" - {component.ComponentName}: +{generator.CurrentPowerGeneration.ToString("n2")} W ({(generator.CurrentPowerGeneration / generator.MaximumPowerGeneration * 100).ToString("n2")}%)";
-                }
-                if (component is IPowerStorage)
-                {
-                    IPowerStorage storage = component as IPowerStorage;
-                    appendString = $" - {component.ComponentName}: {(storage.CurrentCapacity/3600).ToString("n2")} Wh ({(storage.CurrentCapacity / storage.MaximumCapacity * 100).ToString("n2")}%)";
-                }
-                detailPrint[component.Category].AppendLine(appendString);
                 
+                detailPrint[component.Category].AppendLine($" - {component.ComponentName}: {component.GetFormattedString()}");
             }
 
             foreach(var print in detailPrint)

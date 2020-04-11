@@ -34,6 +34,11 @@ namespace SpaceManager.Components
             CurrentCapacity = Math.Min(CurrentCapacity + amt, MaximumCapacity);
         }
 
+        public string GetFormattedString()
+        {
+            return string.Format("{0:N2} Wh ({1:N2}%)", CurrentCapacity / 3600, CurrentCapacity / MaximumCapacity * 100);
+        }
+
         public void Tick()
         {
             

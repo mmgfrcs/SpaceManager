@@ -11,6 +11,6 @@ namespace SpaceManager.Interfaces
         string Description { get; }
         double MaxDurability { get; }
         double CurrentDurability { get; set; }
-        
+        string GetFormattedString();
     }
 }

@@ -17,6 +17,11 @@ namespace SpaceManager.Components
         public bool TickEnabled => CurrentDurability > 0;
         public string Category => "Solar Panels";
 
+        public string GetFormattedString()
+        {
+            return string.Format("+{0:N2} W ({1:N2}%)", CurrentPowerGeneration, CurrentPowerGeneration / MaximumPowerGeneration * 100);
+        }
+
         public void Tick()
         {
             CurrentPowerGeneration = Math.Pow(Math.Abs(Math.Sin(Math.PI / 360 * GameEngine.RunningEngine.GameTime)), 2.5) * MaximumPowerGeneration;
