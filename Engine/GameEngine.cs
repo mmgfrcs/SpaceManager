@@ -1,81 +1,75 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Threading;
 using SpaceManager.Components;
-using SpaceManager.Engine.Interfaces;
 using SpaceManager.Interfaces;
 
 namespace SpaceManager.Engine {
-    public class GameEngine : IGameEngine, IInitializeRequired
+    public class GameEngine
     {
         //Game constants
         public const int TICK_TIME = 20;
+        public static GameEngine RunningEngine;
 
-        List<IGameState> gameStates = new List<IGameState>();
-        IPlayer player;
-        IStation station;
+        public double GameTime { get; private set; } = 90;
+
+        GameDataBase<Player, Station> gameData;
         Timer timer;
 
-        double power = 0;
+        private GameEngine()
+        {
 
-        public void Initialize() {
+        }
+
+        public static GameEngine Initialize() {
+            RunningEngine = new GameEngine();
             Console.Clear();
-            gameStates.Clear();
+            RunningEngine.gameData = new GameData();
 
-            player = new Player();
-            player.Initialize("Player");
+            RunningEngine.gameData.LoadData();
 
-            station = new Station();
-            station.AddComponent(new SolarPanel());
-            station.AddComponent(new SolarPanel());
-
-            for (int i = 0; i < station.GetComponentCount(); i++)
-            {
-                IComponent component = station.GetComponent(i);
-                if (component is IInitializeRequired)
-                    (component as IInitializeRequired).Initialize();
-            }
-
-            timer = new Timer(GameUpdate, null, TICK_TIME, TICK_TIME);
+            RunningEngine.timer = new Timer(RunningEngine.GameUpdate, null, TICK_TIME, TICK_TIME);
+            return RunningEngine;
         }
 
         private void GameUpdate(object state)
         {
-            station.Tick();
+            GameTime += TICK_TIME / 1000D;
+            gameData.CurrentStation.Tick();
         }
 
         public void NextStep()
         {
             Console.Clear();
-            for(int i = 0; i<station.GetComponentCount();i++)
+
+            Dictionary<string, StringBuilder> detailPrint = new Dictionary<string, StringBuilder>();
+
+            for (int i = 0; i<gameData.CurrentStation.GetComponentCount(); i++)
             {
-                IComponent component = station.GetComponent(i);
-                if(component is IPowerGenerator)
+                IComponent component = gameData.CurrentStation.GetComponent(i);
+                if (!detailPrint.ContainsKey(component.Category))
+                    detailPrint.Add(component.Category, new StringBuilder(component.Category + ":\n"));
+
+                string appendString = "";
+                if (component is IPowerGenerator)
                 {
-                    Console.WriteLine("{0}: +{1} W", component.ComponentName, (component as IPowerGenerator).CurrentPowerGeneration.ToString("n2"));
-                    power += (component as IPowerGenerator).CurrentPowerGeneration * TICK_TIME / 1000;
+                    IPowerGenerator generator = component as IPowerGenerator;
+                    appendString = $" - {component.ComponentName}: +{generator.CurrentPowerGeneration.ToString("n2")} W ({(generator.CurrentPowerGeneration / generator.MaximumPowerGeneration * 100).ToString("n2")}%)";
                 }
+                if (component is IPowerStorage)
+                {
+                    IPowerStorage storage = component as IPowerStorage;
+                    appendString = $" - {component.ComponentName}: {(storage.CurrentCapacity/3600).ToString("n2")} Wh ({(storage.CurrentCapacity / storage.MaximumCapacity * 100).ToString("n2")}%)";
+                }
+                detailPrint[component.Category].AppendLine(appendString);
+                
             }
-            Console.WriteLine("Power: {0} Wh", power);
-        }
 
-        public void Print(string text)
-        {
-            Console.WriteLine(text);
+            foreach(var print in detailPrint)
+            {
+                Console.WriteLine(print.Value.ToString());
+            }
         }
-
-        public void Print(string text, ConsoleColor color)
-        {
-            Console.ForegroundColor = color;
-            Console.WriteLine(text);
-            Console.ResetColor();
-        }
-
-        public string RequestUserInput()
-        {
-            return Console.ReadLine();
-        }
-
-        
     }
 }

@@ -7,8 +7,7 @@ namespace SpaceManager
     {
         static void Main(string[] args)
         {
-            GameEngine engine = new GameEngine();
-            engine.Initialize();
+            GameEngine engine = GameEngine.Initialize();
             while(true)
             {
                 engine.NextStep();

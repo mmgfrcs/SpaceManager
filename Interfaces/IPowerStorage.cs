@@ -11,5 +11,8 @@ namespace SpaceManager.Interfaces
         double StorageEfficiency { get; }
         double StorageDrain { get; }
 
+        void AddPower(double amt);
+        void UsePower(double amt);
+        
     }
 }
