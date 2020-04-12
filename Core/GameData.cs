@@ -5,27 +5,27 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
+using SpaceManager.Serialization;
 
 namespace SpaceManager
 {
-    class GameData : GameDataBase<Player, Station>
+    class GameData : GameDataBase<Station>
     {
         
         public override void LoadData()
         {
             if(File.Exists(SaveLocation))
             {
-                GameDataStructure<Player, Station> data =
-                    JsonConvert.DeserializeObject<GameDataStructure<Player, Station>>(File.ReadAllText(SaveLocation));
-                CurrentPlayer = data.currentPlayer;
-                CurrentStation = data.currentStation;
-                if (CurrentPlayer is IInitializeRequired) (CurrentPlayer as IInitializeRequired).Initialize();
+                Station data = JsonConvert.DeserializeObject<Station>(File.ReadAllText(SaveLocation), new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    SerializationBinder = new Whitelister()
+                });
+                CurrentStation = data;
                 if (CurrentStation is IInitializeRequired) (CurrentStation as IInitializeRequired).Initialize();
             }
             else
             {
-                CurrentPlayer = new Player();
-                CurrentPlayer.Initialize("Player");
                 CurrentStation = new Station();
                 CurrentStation.Initialize();
                 //SaveData();
@@ -34,8 +34,8 @@ namespace SpaceManager
 
         public override void SaveData()
         {
-            GameDataStructure<Player, Station> data = new GameDataStructure<Player, Station>(CurrentPlayer, CurrentStation);
-            File.WriteAllText(SaveLocation, JsonConvert.SerializeObject(data));
+            Directory.CreateDirectory(Path.GetDirectoryName(SaveLocation));
+            File.WriteAllText(SaveLocation, JsonConvert.SerializeObject(CurrentStation, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All }));
         }
     }
 }

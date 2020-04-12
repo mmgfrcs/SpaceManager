@@ -6,10 +6,9 @@ using SpaceManager.Components;
 
 namespace SpaceManager
 {
-    public abstract class GameDataBase<T, U> : IGameData where T : IPlayer where U : IStation 
+    public abstract class GameDataBase<T> : IGameData where T : IStation 
     {
-        public T CurrentPlayer { get; set; }
-        public U CurrentStation { get; set; }
+        public T CurrentStation { get; set; }
         public string SaveLocation { get; set; } = "Data/GameData.json";
 
         public abstract void LoadData();

@@ -14,19 +14,16 @@ namespace SpaceManager.Engine {
 
         public double GameTime { get; private set; } = 90;
 
-        GameDataBase<Player, Station> gameData;
+        GameDataBase<Station> gameData;
         Timer timer;
 
-        private GameEngine()
-        {
-
-        }
+        private GameEngine() { }
 
         public static GameEngine Initialize() {
             RunningEngine = new GameEngine();
             Console.Clear();
+            
             RunningEngine.gameData = new GameData();
-
             RunningEngine.gameData.LoadData();
 
             RunningEngine.timer = new Timer(RunningEngine.GameUpdate, null, TICK_TIME, TICK_TIME);
@@ -43,6 +40,9 @@ namespace SpaceManager.Engine {
         {
             Console.Clear();
 
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{gameData.CurrentStation.Player.PlayerName} - Healthy");
+            Console.ResetColor();
             Dictionary<string, StringBuilder> detailPrint = new Dictionary<string, StringBuilder>();
 
             for (int i = 0; i<gameData.CurrentStation.GetComponentCount(); i++)
@@ -58,6 +58,10 @@ namespace SpaceManager.Engine {
             {
                 Console.WriteLine(print.Value.ToString());
             }
+
+            Console.SetCursorPosition(0, Console.WindowHeight - 2);
+            Console.WriteLine("[S]etup [A]ll");
+            Console.Write(" > ");
         }
     }
 }

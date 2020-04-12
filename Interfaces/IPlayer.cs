@@ -7,7 +7,6 @@ namespace SpaceManager.Interfaces
     public interface IPlayer
     {
         string PlayerName { get; }
-
         void Initialize(string name);
     }
 }

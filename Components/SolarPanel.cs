@@ -16,10 +16,16 @@ namespace SpaceManager.Components
         public double CurrentDurability { get; set; } = 200;
         public bool TickEnabled => CurrentDurability > 0;
         public string Category => "Solar Panels";
+        public bool IsActive { get; private set; } = true;
 
         public string GetFormattedString()
         {
             return string.Format("+{0:N2} W ({1:N2}%)", CurrentPowerGeneration, CurrentPowerGeneration / MaximumPowerGeneration * 100);
+        }
+
+        public void SetActive(bool active)
+        {
+            IsActive = active;
         }
 
         public void Tick()

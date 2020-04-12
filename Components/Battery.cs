@@ -1,4 +1,5 @@
-﻿using SpaceManager.Interfaces;
+﻿using SpaceManager.Engine;
+using SpaceManager.Interfaces;
 using System;
 
 namespace SpaceManager.Components
@@ -15,23 +16,30 @@ namespace SpaceManager.Components
 
         public double CurrentDurability { get; set; } = 900;
 
-        public bool TickEnabled => false;
+        public bool TickEnabled => true;
 
         public double CurrentCapacity { get; private set; } = 900000;
 
         public double MaximumCapacity => 3.6e+6;
 
         public double StorageEfficiency => 0.9;
-
+        public bool IsActive { get; private set; } = true;
         public double StorageDrain => 1;
 
         /// <summary>
         /// Adds energy to the battery
         /// </summary>
         /// <param name="amt">Amount of energy to add in Ws</param>
-        public void AddPower(double amt)
+        public double AddPower(double amt)
         {
-            CurrentCapacity = Math.Min(CurrentCapacity + amt, MaximumCapacity);
+            CurrentCapacity += (amt * StorageEfficiency);
+            if (CurrentCapacity > MaximumCapacity)
+            {
+                double overCap = CurrentCapacity - MaximumCapacity;
+                CurrentCapacity = MaximumCapacity;
+                return overCap;
+            }
+            else return 0;
         }
 
         public string GetFormattedString()
@@ -39,14 +47,26 @@ namespace SpaceManager.Components
             return string.Format("{0:N2} Wh ({1:N2}%)", CurrentCapacity / 3600, CurrentCapacity / MaximumCapacity * 100);
         }
 
-        public void Tick()
+        public void SetActive(bool active)
         {
-            
+            IsActive = active;
         }
 
-        public void UsePower(double amt)
+        public void Tick()
         {
-            CurrentCapacity = Math.Max(CurrentCapacity - amt, 0);
+            UsePower(StorageDrain * GameEngine.TICK_TIME / 1000);
+        }
+
+        public double UsePower(double amt)
+        {
+            CurrentCapacity -= amt;
+            if (CurrentCapacity < 0)
+            {
+                double overCap = Math.Abs(amt);
+                CurrentCapacity = 0;
+                return overCap;
+            }
+            else return 0;
         }
     }
 }
