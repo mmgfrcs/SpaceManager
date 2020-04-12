@@ -41,8 +41,13 @@ namespace SpaceManager.Engine {
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{gameData.CurrentStation.Player.PlayerName} - Healthy");
+            Console.Write($"{gameData.CurrentStation.Player.PlayerName} - Healthy");
             Console.ResetColor();
+            double hour = (GameTime % 360) / 360 * 24;
+            TimeSpan gameTimeSpan = new TimeSpan(Convert.ToInt32(Math.Floor(GameTime / 360)) + 1, (int)Math.Floor(hour), (int)Math.Floor((hour - Math.Floor(hour)) * 60), 0);
+            string clock = gameTimeSpan.ToString(@"\D%d\ hh\:mm");
+            Console.SetCursorPosition(Console.WindowWidth - clock.Length, 0);
+            Console.WriteLine(clock);
             Dictionary<string, StringBuilder> detailPrint = new Dictionary<string, StringBuilder>();
 
             for (int i = 0; i<gameData.CurrentStation.GetComponentCount(); i++)

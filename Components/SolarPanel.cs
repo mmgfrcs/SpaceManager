@@ -30,7 +30,7 @@ namespace SpaceManager.Components
 
         public void Tick()
         {
-            CurrentPowerGeneration = Math.Pow(Math.Abs(Math.Sin(Math.PI / 360 * GameEngine.RunningEngine.GameTime)), 2.5) * MaximumPowerGeneration;
+            CurrentPowerGeneration = Math.Pow(Math.Sin(Math.PI / 360 * GameEngine.RunningEngine.GameTime), 6) * MaximumPowerGeneration;
         }
     }
 }
