@@ -9,7 +9,7 @@ using SpaceManager.Serialization;
 
 namespace SpaceManager
 {
-    class GameData : GameDataBase<Station>
+    class GameData : GameDataBase<Station, Player>
     {
         
         public override void LoadData()

@@ -4,9 +4,9 @@ using System.Text;
 
 namespace SpaceManager.Interfaces
 {
-    public interface IStation : ITick
+    public interface IStation<T> : ITick where T : IPlayer
     {
-        IPlayer Player { get; }
+        T Player { get; }
         void AddComponent(IComponent component);
         IComponent GetComponent(int n);
         IComponent FindComponent(Predicate<IComponent> predicate);

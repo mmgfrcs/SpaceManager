@@ -6,13 +6,13 @@ using System.Collections.Generic;
 namespace SpaceManager.Components
 {
     [Serializable]
-    class Station : IStation, IInitializeRequired
+    class Station : IStation<Player>, IInitializeRequired
     {
         List<IComponent> components = new List<IComponent>();
 
         public bool TickEnabled => true;
 
-        public IPlayer Player { get; private set; }
+        public Player Player { get; private set; }
 
         public void AddComponent(IComponent component) => components.Add(component);
 
@@ -46,6 +46,8 @@ namespace SpaceManager.Components
 
         public void Tick()
         {
+            if (Player is ITick pTick && pTick.TickEnabled) 
+                pTick.Tick();
             PowerTick();
         }
 

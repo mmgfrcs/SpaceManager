@@ -6,12 +6,11 @@ using System.Text;
 namespace SpaceManager
 {
     [Serializable]
-    class Player : IPlayer, IPowerConsumer
+    class Player : IPlayer
     {
         public string PlayerName { get; private set; }
-        public double CurrentPowerUsage => 10;
-        public double MinimumPowerUsage => 0;
-        public bool PartialFunctionAvailable => false;
+        public double Health { get; set; } = 100;
+        public double Hunger { get; set; } = 100;
 
         public void Initialize(string name)
         {

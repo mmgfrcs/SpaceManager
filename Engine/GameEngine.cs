@@ -17,9 +17,10 @@ namespace SpaceManager.Engine {
         //Game constants
         public const int TICK_TIME = 20;
         public static GameEngine RunningEngine;
+        
         public double GameTime { get; private set; } = 90;
 
-        GameDataBase<Station> gameData;
+        GameDataBase<Station, Player> gameData;
         Timer timer;
         GameOptions options = GameOptions.Home;
 
@@ -46,15 +47,26 @@ namespace SpaceManager.Engine {
         {
             Console.Clear();
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"{gameData.CurrentStation.Player.PlayerName} - Healthy");
+            double hungerAmt = gameData.CurrentStation.Player.Hunger;
+            double healthAmt = gameData.CurrentStation.Player.Health;
+            string hunger = hungerAmt < 10 ? "Starving" : hungerAmt < 30 ? "Extremely Hungry" : hungerAmt < 50 ? "Very Hungry" : hungerAmt < 80 ? "Hungry" : "Full";
+            string health = healthAmt < 20 ? "Critical" : healthAmt < 40 ? "Very Sick" : healthAmt < 75 ? "Sick" : "Healthy";
+            ConsoleColor hungerColor = hungerAmt < 30 ? ConsoleColor.Red : hungerAmt < 80 ? ConsoleColor.Yellow : ConsoleColor.Green; 
+            ConsoleColor healthColor = healthAmt < 20 ? ConsoleColor.Red : healthAmt < 75 ? ConsoleColor.Yellow : ConsoleColor.Green;
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write($"{gameData.CurrentStation.Player.PlayerName} - ");
+            Console.ForegroundColor = hungerColor;
+            Console.Write($"{hunger}, ");
+            Console.ForegroundColor = healthColor;
+            Console.WriteLine(health);
             Console.ResetColor();
             double hour = (GameTime % 360) / 360 * 24;
             TimeSpan gameTimeSpan = new TimeSpan(Convert.ToInt32(Math.Floor(GameTime / 360)) + 1, (int)Math.Floor(hour), (int)Math.Floor((hour - Math.Floor(hour)) * 60), 0);
             string clock = gameTimeSpan.ToString(@"\D%d\ hh\:mm");
             Console.SetCursorPosition(Console.WindowWidth - clock.Length, 0);
             Console.WriteLine(clock);
-
+            
             if (options == GameOptions.Exit)
                 return false;
             else if (options == GameOptions.Overview)
