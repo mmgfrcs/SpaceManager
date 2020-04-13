@@ -6,16 +6,22 @@ using SpaceManager.Components;
 using SpaceManager.Interfaces;
 
 namespace SpaceManager.Engine {
+
+    public enum GameOptions
+    {
+        Home, Overview, Exit
+    }
+
     public class GameEngine
     {
         //Game constants
         public const int TICK_TIME = 20;
         public static GameEngine RunningEngine;
-
         public double GameTime { get; private set; } = 90;
 
         GameDataBase<Station> gameData;
         Timer timer;
+        GameOptions options = GameOptions.Home;
 
         private GameEngine() { }
 
@@ -36,7 +42,7 @@ namespace SpaceManager.Engine {
             gameData.CurrentStation.Tick();
         }
 
-        public void NextStep()
+        public bool NextStep()
         {
             Console.Clear();
 
@@ -48,25 +54,74 @@ namespace SpaceManager.Engine {
             string clock = gameTimeSpan.ToString(@"\D%d\ hh\:mm");
             Console.SetCursorPosition(Console.WindowWidth - clock.Length, 0);
             Console.WriteLine(clock);
-            Dictionary<string, StringBuilder> detailPrint = new Dictionary<string, StringBuilder>();
 
-            for (int i = 0; i<gameData.CurrentStation.GetComponentCount(); i++)
+            if (options == GameOptions.Exit)
+                return false;
+            else if (options == GameOptions.Overview)
             {
-                IComponent component = gameData.CurrentStation.GetComponent(i);
-                if (!detailPrint.ContainsKey(component.Category)) 
-                    detailPrint.Add(component.Category, new StringBuilder(component.Category + ":\n"));
-                
-                detailPrint[component.Category].AppendLine($" - {component.ComponentName}: {component.GetFormattedString()}");
+                Dictionary<string, StringBuilder> detailPrint = new Dictionary<string, StringBuilder>();
+
+                for (int i = 0; i < gameData.CurrentStation.GetComponentCount(); i++)
+                {
+                    IComponent component = gameData.CurrentStation.GetComponent(i);
+                    if (!detailPrint.ContainsKey(component.Category))
+                        detailPrint.Add(component.Category, new StringBuilder(component.Category + ":\n"));
+
+                    detailPrint[component.Category].AppendLine($" - {component.ComponentName}: {component.GetFormattedString()}");
+                }
+
+                foreach (var print in detailPrint)
+                {
+                    Console.WriteLine(print.Value.ToString());
+                }
+            }
+            else if (options == GameOptions.Home)
+            {
+                double powerGen = 0, powerUse = 0, powerStore = 0;
+                for (int i = 0; i < gameData.CurrentStation.GetComponentCount(); i++)
+                {
+                    IComponent component = gameData.CurrentStation.GetComponent(i);
+                    if (component is IPowerGenerator gen)
+                        powerGen += gen.CurrentPowerGeneration;
+                    else if (component is IPowerConsumer con)
+                        powerUse += con.CurrentPowerUsage;
+                    else if (component is IPowerStorage sto)
+                        powerStore += sto.CurrentCapacity;
+                                        
+                }
+
+                Console.WriteLine($"Power Generation : {powerGen.ToString("n1")} W");
+                Console.WriteLine($"Power Consumption: {powerUse.ToString("n1")} W");
+                Console.WriteLine($"Power Storage    : {(powerStore / 3600).ToString("n1")} Wh");
             }
 
-            foreach(var print in detailPrint)
-            {
-                Console.WriteLine(print.Value.ToString());
-            }
+            return true;
 
-            Console.SetCursorPosition(0, Console.WindowHeight - 2);
-            Console.WriteLine("[S]etup [A]ll");
-            Console.Write(" > ");
+        }
+
+        public void RequestInput()
+        {
+            Console.SetCursorPosition(0, Console.WindowHeight - 1);
+            if(options == GameOptions.Home)
+            {
+                Console.Write("[O]verview [E]xit");
+                ConsoleKeyInfo info = Console.ReadKey(true);
+
+                if (info.Key == ConsoleKey.E)
+                    options = GameOptions.Exit;
+                else if (info.Key == ConsoleKey.O)
+                    options = GameOptions.Overview;
+            }
+            else if (options == GameOptions.Overview)
+            {
+                Console.Write("[B]ack [E]xit");
+                ConsoleKeyInfo info = Console.ReadKey(true);
+
+                if (info.Key == ConsoleKey.E)
+                    options = GameOptions.Exit;
+                else if (info.Key == ConsoleKey.B)
+                    options = GameOptions.Home;
+            }
         }
     }
 }

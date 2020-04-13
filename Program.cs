@@ -10,8 +10,9 @@ namespace SpaceManager
             GameEngine engine = GameEngine.Initialize();
             while(true)
             {
-                engine.NextStep();
-                Thread.Sleep(500);
+                if (engine.NextStep())
+                    engine.RequestInput();
+                else break;
             }
         }
     }
