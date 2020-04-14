@@ -9,7 +9,7 @@ namespace SpaceManager.Engine {
 
     public enum GameOptions
     {
-        Home, Overview, Exit
+        Home, Overview, Details, Exit
     }
 
     public class GameEngine
@@ -23,6 +23,7 @@ namespace SpaceManager.Engine {
         GameDataBase<Station, Player> gameData;
         Timer timer;
         GameOptions options = GameOptions.Home;
+        int detailNum = -1;
 
         private GameEngine() { }
 
@@ -41,6 +42,11 @@ namespace SpaceManager.Engine {
         {
             GameTime += TICK_TIME / 1000D;
             gameData.CurrentStation.Tick();
+        }
+
+        public IMaterialData GetMaterialData(string matId)
+        {
+            return gameData.MaterialDatabase.Find(x => x.MaterialID == matId);
         }
 
         public bool NextStep()
@@ -79,7 +85,7 @@ namespace SpaceManager.Engine {
                     if (!detailPrint.ContainsKey(component.Category))
                         detailPrint.Add(component.Category, new StringBuilder(component.Category + ":\n"));
 
-                    detailPrint[component.Category].AppendLine($" - {component.ComponentName}: {component.GetFormattedString()}");
+                    detailPrint[component.Category].AppendLine($" {i+1,2}. {component.ComponentName}: {component.GetFormattedString()}");
                 }
 
                 foreach (var print in detailPrint)
@@ -106,6 +112,17 @@ namespace SpaceManager.Engine {
                 Console.WriteLine($"Power Consumption: {powerUse.ToString("n1")} W");
                 Console.WriteLine($"Power Storage    : {(powerStore / 3600).ToString("n1")} Wh");
             }
+            else if (options == GameOptions.Details)
+            {
+                IComponent component = gameData.CurrentStation.GetComponent(detailNum - 1);
+                Console.WriteLine($"{component.ComponentName} ({(component.IsActive ? "Active" : "Inactive")})");
+                Console.WriteLine(component.Category);
+                Console.WriteLine($"{component.CurrentDurability:N1}/{component.MaxDurability:N1}");
+                Console.WriteLine();
+                Console.WriteLine(component.Description);
+                Console.WriteLine();
+                Console.WriteLine(component.GetDetailString());
+            }
 
             return true;
 
@@ -126,13 +143,29 @@ namespace SpaceManager.Engine {
             }
             else if (options == GameOptions.Overview)
             {
+                Console.Write("[B]ack [E]xit > ");
+                string num = Console.ReadLine();
+
+
+                if (num.ToLowerInvariant() == "e")
+                    options = GameOptions.Exit;
+                else if (num.ToLowerInvariant() == "b")
+                    options = GameOptions.Home;
+                else if(int.TryParse(num, out int res))
+                {
+                    options = GameOptions.Details;
+                    detailNum = res;
+                }
+            }
+            else if (options == GameOptions.Details)
+            {
                 Console.Write("[B]ack [E]xit");
                 ConsoleKeyInfo info = Console.ReadKey(true);
 
                 if (info.Key == ConsoleKey.E)
                     options = GameOptions.Exit;
                 else if (info.Key == ConsoleKey.B)
-                    options = GameOptions.Home;
+                    options = GameOptions.Overview;
             }
         }
     }

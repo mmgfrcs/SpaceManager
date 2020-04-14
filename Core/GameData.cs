@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
 using SpaceManager.Serialization;
+using SpaceManager.Core;
 
 namespace SpaceManager
 {
@@ -14,7 +15,16 @@ namespace SpaceManager
         
         public override void LoadData()
         {
-            if(File.Exists(SaveLocation))
+            if (Directory.Exists(MaterialFilesFolder))
+            {
+                string[] paths = Directory.GetFiles(MaterialFilesFolder, "*.json");
+                MaterialDatabase = new List<IMaterialData>();
+                for (int i = 0; i < paths.Length; i++)
+                    MaterialDatabase.Add(JsonConvert.DeserializeObject<MaterialData>(File.ReadAllText(paths[i])));
+            }
+            else Directory.CreateDirectory(MaterialFilesFolder);
+
+            if (File.Exists(SaveLocation))
             {
                 Station data = JsonConvert.DeserializeObject<Station>(File.ReadAllText(SaveLocation), new JsonSerializerSettings()
                 {
@@ -30,6 +40,7 @@ namespace SpaceManager
                 CurrentStation.Initialize();
                 //SaveData();
             }
+
         }
 
         public override void SaveData()

@@ -4,10 +4,9 @@ using System.Text;
 
 namespace SpaceManager.Interfaces
 {
-    public interface IMaterial : IMaterialData
+    public interface IMaterialData
     {
-
-        double Amount { get; }
-        void ChangeAmount(double amount);
+        string MaterialID { get; }
+        string DisplayName { get; }
     }
 }

@@ -42,6 +42,11 @@ namespace SpaceManager.Components
             else return 0;
         }
 
+        public string GetDetailString()
+        {
+            return $"Power Stored: {CurrentCapacity / 3600:N2}/{MaximumCapacity/3600:N2} Wh\nCharging Efficiency: {StorageEfficiency*100:N1}%";
+        }
+
         public string GetFormattedString()
         {
             return string.Format("{0:N2} Wh ({1:N2}%)", CurrentCapacity / 3600, CurrentCapacity / MaximumCapacity * 100);

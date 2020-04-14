@@ -37,6 +37,10 @@ namespace SpaceManager.Components
             AddComponent(new SolarPanel() { ComponentName = "Solar Panel 1" });
             AddComponent(new SolarPanel() { ComponentName = "Solar Panel 2" });
             AddComponent(new Battery() { ComponentName = "Battery 1" });
+            SurvivalBox box = new SurvivalBox();
+            box.AddMaterial(new Material(GameEngine.RunningEngine.GetMaterialData("food"), 10));
+            box.AddMaterial(new Material(GameEngine.RunningEngine.GetMaterialData("water"), 30));
+            AddComponent(box);
             for (int i = 0; i < components.Count; i++)
             {
                 if (components[i] is IInitializeRequired)

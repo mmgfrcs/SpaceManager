@@ -18,6 +18,11 @@ namespace SpaceManager.Components
         public string Category => "Solar Panels";
         public bool IsActive { get; private set; } = true;
 
+        public string GetDetailString()
+        {
+            return $"Power Generation: {CurrentPowerGeneration:N2}/{MaximumPowerGeneration:N2} W\nEfficiency: {GenerationEfficiency:N0}%";
+        }
+
         public string GetFormattedString()
         {
             return string.Format("+{0:N2} W ({1:N2}%)", CurrentPowerGeneration, CurrentPowerGeneration / MaximumPowerGeneration * 100);

@@ -10,6 +10,8 @@ namespace SpaceManager
     {
         public T CurrentStation { get; set; }
         public string SaveLocation { get; set; } = "Data/GameData.json";
+        public List<IMaterialData> MaterialDatabase { get; protected set; }
+        public string MaterialFilesFolder { get; set; } = "Data/Materials";
 
         public abstract void LoadData();
 
