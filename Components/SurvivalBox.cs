@@ -88,5 +88,10 @@ namespace SpaceManager.Components
         {
             return $"Storage: {GetFormattedString()}\n{PrintStorageContents()}";
         }
+
+        public void ClearMaterial(string matId)
+        {
+            materialStore.Remove(matId);
+        }
     }
 }

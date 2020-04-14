@@ -2,6 +2,7 @@
 using SpaceManager.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpaceManager.Components
 {
@@ -23,6 +24,7 @@ namespace SpaceManager.Components
         public IComponent GetComponent(int n) => components[n];
 
         public int GetComponentCount() => components.Count;
+
 
         public void Initialize()
         {
@@ -52,7 +54,49 @@ namespace SpaceManager.Components
         {
             if (Player is ITick pTick && pTick.TickEnabled) 
                 pTick.Tick();
+
+
+
+            CheckMaterials(new List<IMaterial>((Player as IMaterialConsumer).RequiredMaterials));
+
             PowerTick();
+        }
+
+        void CheckMaterials(List<IMaterial> materials)
+        {
+            List<IComponent> comps = FindAllComponents(x => x is IMaterialStorage);
+            
+            if (comps.Count > 0)
+            {
+                for (int i = 0; i < comps.Count; i++)
+                {
+                    IMaterialStorage store = comps[i] as IMaterialStorage;
+                    for (int j = 0; j < materials.Count; j++)
+                    {
+                        IMaterial storeMat = store.GetMaterial(materials[j].MaterialID);
+                        if (storeMat.Amount >= materials[j].Amount)
+                        {
+                            store.RemoveMaterial(materials[j]);
+                            materials.RemoveAt(j);
+                            j--;
+                        }
+                        else
+                        {
+                            materials[j].ChangeAmount(storeMat.Amount);
+                            store.ClearMaterial(materials[j].MaterialID);
+                        }
+                    }
+                }
+
+                if (materials.Count > 0)
+                {
+                    if(materials.Find(x => x.MaterialID == "food" || x.MaterialID == "water") != null)
+                    {
+                        //Game Over
+                    }
+
+                }
+            }
         }
 
         void PowerTick()

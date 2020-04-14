@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,7 +14,14 @@ namespace SpaceManager.Interfaces
     [Serializable]
     public struct MaterialRatio
     {
-        IMaterial material;
-        double ratio;
+        public IMaterial material;
+        public double ratio;
+
+        [JsonConstructor]
+        public MaterialRatio(IMaterial material, double ratio)
+        {
+            this.material = material;
+            this.ratio = ratio;
+        }
     }
 }

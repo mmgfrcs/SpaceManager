@@ -6,6 +6,6 @@ namespace SpaceManager.Interfaces
 {
     public interface IMaterialConsumer
     {
-        List<MaterialRatio> RequiredMaterials { get; }
+        List<IMaterial> RequiredMaterials { get; }
     }
 }

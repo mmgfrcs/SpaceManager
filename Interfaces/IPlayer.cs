@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SpaceManager.Interfaces
 {
-    public interface IPlayer
+    public interface IPlayer : IMaterialConsumer
     {
         string PlayerName { get; }
         void Initialize(string name);
